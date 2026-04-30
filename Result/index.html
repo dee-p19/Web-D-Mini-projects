@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nursery Superstar Celebration!</title>
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Playful Font -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Fredoka One', cursive;
+            background: #87CEEB; /* Bright Sky Blue */
+        }
+
+        /* Sun and Clouds */
+        .sun {
+            position: fixed; top: 30px; right: 60px;
+            width: 90px; height: 90px;
+            background: radial-gradient(circle, #fff7a0 40%, #ffd700 70%, #ffaa00 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 40px 20px rgba(255,220,0,0.4), 0 0 80px 40px rgba(255,200,0,0.15);
+            animation: sunPulse 3s ease-in-out infinite;
+            z-index: 2;
+        }
+        .sun::before {
+            content: ''; position: absolute; inset: -18px;
+            background: repeating-conic-gradient(#ffd700 0deg 10deg, transparent 10deg 20deg);
+            border-radius: 50%;
+            animation: spinRay 10s linear infinite;
+            opacity: 0.5; z-index: -1;
+        }
+        @keyframes sunPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+        @keyframes spinRay { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+            animation: float 25s linear infinite;
+        }
+        .cloud::after, .cloud::before {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+        .c1 { width: 120px; height: 40px; top: 10%; left: -150px; }
+        .c1::after { width: 50px; height: 50px; top: -20px; left: 15px; }
+        .c1::before { width: 70px; height: 70px; top: -35px; left: 40px; }
+
+        .c2 { width: 150px; height: 50px; top: 30%; left: -200px; animation-delay: 7s; }
+        .c2::after { width: 60px; height: 60px; top: -25px; left: 20px; }
+        .c2::before { width: 80px; height: 80px; top: -40px; left: 50px; }
+
+        @keyframes float {
+            from { left: -200px; }
+            to { left: 110%; }
+        }
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+        /*Rainbow*/
+
+        .rainbow {
+            position: fixed;
+            top: -30px; left: -30px;
+            width: 320px; height: 320px;
+            border-radius: 0 0 320px 0;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .rainbow-arc {
+            position: absolute;
+            top: 0; left: 0;
+            border-style: solid;
+            border-right: none;
+            border-top: none;
+            border-radius: 0 0 100% 0;
+        }
+        .r1 { width:320px;height:320px; border-width:16px; border-color:transparent transparent #ff3c3c transparent; }
+        .r2 { width:290px;height:290px; border-width:16px; border-color:transparent transparent #ff8c00 transparent; }
+        .r3 { width:260px;height:260px; border-width:16px; border-color:transparent transparent #ffe600 transparent; }
+        .r4 { width:230px;height:230px; border-width:16px; border-color:transparent transparent #3be63b transparent; }
+        .r5 { width:200px;height:200px; border-width:16px; border-color:transparent transparent #1e90ff transparent; }
+        .r6 { width:170px;height:170px; border-width:16px; border-color:transparent transparent #9b59b6 transparent; }
+        
+
+        #tap-text {
+            font-size: 2rem;
+            color: white;
+            text-shadow: 3px 3px 0px #ff69b4;
+            margin-bottom: 20px;
+            animation: bounceText 1s infinite alternate;
+        }
+
+        @keyframes bounceText {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+        /* 3D Red Balloon */
+        #celebration-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+
+        #balloon {
+            width: 140px;
+            height: 170px;
+            background: radial-gradient(circle at 30% 30%, #ff4d4d, #b30000);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            position: relative;
+            cursor: pointer;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.2), 0 10px 20px rgba(0,0,0,0.3);
+            animation: wiggle 2.5s ease-in-out infinite;
+        }
+
+        #balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 15px solid #b30000;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-5deg) translateY(0); }
+            50% { transform: rotate(5deg) translateY(-25px); }
+        }
+
+        /* Result Reveal */
+        #result-display {
+            display: none;
+            text-align: center;
+            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .photo-frame {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin: 0 auto 20px;
+        }
+
+        .kid-photo {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 10px solid white;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .trophy {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            font-size: 90px;
+            animation: rotateTrophy 5s linear infinite;
+        }
+
+        @keyframes rotateTrophy {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        .bouncy-text {
+            color: #FF4500;
+            font-size: 3.5rem;
+            text-shadow: 4px 4px 0px white;
+            margin: 20px 0;
+            animation: bounce 0.6s ease infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-15px); }
+        }
+
+        button {
+            padding: 15px 35px;
+            font-size: 1.4rem;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Fredoka One', cursive;
+            box-shadow: 0 6px #2E7D32;
+            transition: all 0.2s;
+        }
+        button:active {
+            box-shadow: 0 2px #2E7D32;
+            transform: translateY(4px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sun"></div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+
+    <!-- CORNER RAINBOW top-left -->
+    <div class="rainbow">
+    <div class="rainbow-arc r1"></div>
+    <div class="rainbow-arc r2"></div>
+    <div class="rainbow-arc r3"></div>
+    <div class="rainbow-arc r4"></div>
+    <div class="rainbow-arc r5"></div>
+    <div class="rainbow-arc r6"></div>
+    </div>
+
+    <div id="celebration-container">
+        <!-- The Wiggling Balloon -->
+         <div id="tap-text">🎈 Tap the Balloon 🎈</div>
+        <div id="balloon" onclick="popBalloon()"></div>
+
+        <!-- Hidden Result Content -->
+        <div id="result-display">
+            <div class="photo-frame">
+                <!-- PLACEHOLDER: Replace this URL with your little one's photo link -->
+                <img src="kavyansh.png"  class="kid-photo">
+                <div class="trophy">🏆</div>
+            </div>
+            <h1 class="bouncy-text">Our Superstar Kavyansh is #1!</h1>
+            <button onclick="playCheer()">📣 Play Cheer!</button>
+        </div>
+    </div>
+
+    <!-- Audio Effects -->
+    <audio id="pop-sound" src="https://www.myinstants.com/media/sounds/balloon-pop.mp3"></audio>
+    <audio id="cheer-sound" src="https://www.myinstants.com/media/sounds/cheer.mp3"></audio>
+
+    <script>
+        function popBalloon() {
+            // 1. Play pop sound
+            document.getElementById('pop-sound').play();
+
+            // 2. Hide balloon and show result
+            document.getElementById('balloon').style.display = 'none';
+            document.getElementById('tap-text').style.display = 'none';
+            const result = document.getElementById('result-display');
+            result.style.display = 'block';
+
+            // 3. Massive Confetti & Sprinkles Burst
+            var duration = 4 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+              confetti({
+                particleCount: 5,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
+              });
+              confetti({
+                particleCount: 5,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff']
+              });
+
+              if (Date.now() < end) {
+                requestAnimationFrame(frame);
+              }
+            }());
+        }
+
+        function playCheer() {
+            document.getElementById('cheer-sound').play();
+            // Extra center confetti on cheer
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 }
+            });
+        }
+    </script>
+</body>
+</html>
+
